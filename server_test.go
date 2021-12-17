@@ -7,7 +7,7 @@ import (
 )
 
 func TestServer(t *testing.T) {
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req := newGetReq("/")
 	res := httptest.NewRecorder()
 
 	Serve(res, req)
@@ -25,4 +25,8 @@ func assertStatus(t testing.TB, got, want int) {
 	if got != want {
 		t.Errorf("\nGot status: %d\nWant status: %d", got, want)
 	}
+}
+
+func newGetReq(path string) *http.Request {
+	return httptest.NewRequest(http.MethodGet, path, nil)
 }
