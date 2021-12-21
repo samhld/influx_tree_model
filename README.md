@@ -24,10 +24,113 @@ Example:
 
 Proposals for user input:
 * `MEASUREMENT,region,{host,app},FIELD`
-* `MEASUREMENT>region>{host,app},FIELD`
+* `MEASUREMENT>region>{host|app},FIELD`
 * `MEASUREMENT|region|{host,app},FIELD`
 
-Data may not follow a structure exactly like this, where `MEASUREMENT` is the top level node of the tree.  It could look like (using first proposal):
+Data may not follow a structure exactly like this, where `MEASUREMENT` is the top level node of the tree.  It could look like (using second proposal):
 
-* `region,{host,app},MEASUREMENT,FIELD`
+* `region>{host|app}>MEASUREMENT,FIELD`
 
+In the above, the output might look like:
+
+Top tier:
+```
+us-west
+us-east
+```
+2 tiers:
+```
+us-west
+└──host
+└──app
+us-east
+└──host
+└──app
+```
+3 tiers:
+```
+us-west
+└──host
+│    └──001
+│    └──002
+│    └──003
+└──app
+     └──cart
+     └──login
+us-east
+└──host
+│    └──001
+│    └──002
+│    └──003
+└──app
+    └──cart
+    └──login
+```
+Again, `app` and `host` are the same tier and they are mutually dependent so some hosts have multiple apps and some apps are on multiple hosts.  This would turn out like (relevant tiers only to conserve space): 
+```
+host
+└──001
+    └──app
+    │    └──cart
+            └──cpu
+                └──usage_user
+                └──usage_system
+            └──mem
+                └──available
+                └──used
+        └──login
+            └──cpu
+                └──usage_user
+                └──usage_system
+            └──mem
+                └──available
+                └──used
+└──002
+    └──app
+        └──cart
+            └──cpu
+                └──usage_user
+                └──usage_system
+            └──mem
+                └──available
+                └──used
+└──003
+    └──app
+        └──login
+            └──cpu
+                └──usage_user
+                └──usage_system
+app
+└──cart
+    └──host
+        └──001
+            └──cpu
+                └──usage_user
+                └──usage_system
+            └──mem
+                └──available
+                └──used
+        └──002
+            └──cpu
+                └──usage_user
+                └──usage_system
+            └──mem
+                └──available
+                └──used
+└──login
+    └──host
+        └──001
+            └──cpu
+                └──usage_user
+                └──usage_system
+            └──mem
+                └──available
+                └──used
+        └──003
+            └──cpu
+                └──usage_user
+                └──usage_system
+            └──mem
+                └──available
+                └──used
+```
