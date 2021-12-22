@@ -6,8 +6,13 @@ import (
 )
 
 type RuleTokenizer struct {
+<<<<<<< HEAD
 	// line string
 	re *regexp.Regexp
+=======
+	line string
+	re   *regexp.Regexp
+>>>>>>> ddf0be69c869da6c5baea6197110d12fbd2744f0
 }
 
 type RuleMap struct {
@@ -51,6 +56,8 @@ func MeasIndex(line string) {
 func ParseMeas(point string) string {
 	substrings := strings.Split(point, ",")
 	return substrings[0]
+=======
+
 }
 
 type Line struct {
@@ -75,6 +82,38 @@ type Field struct {
 type Tags map[string]string
 type Fields map[string]interface{}
 
+<<<<<<< HEAD
+=======
+func NewRuleTokenizer(line string) *RuleTokenizer {
+	return &RuleTokenizer{
+		line,
+		regexp.MustCompile(`(?P<words>[a-z A-Z _]+)|(?P<ops>[|>\s])`),
+	}
+}
+func (t *RuleTokenizer) Tokenize(rule string) *RuleMap {
+	matches := t.re.FindAllStringSubmatch(rule, -1)
+	ruleMap := &RuleMap{}
+	for i, match := range matches {
+		if match[1] != "" { // 2nd position is a 'word'
+			word := Word{match[1], i}
+			ruleMap.words = append(ruleMap.words, word)
+		} else {
+			op := Op{match[2], i}
+			ruleMap.ops = append(ruleMap.ops, op)
+		}
+	}
+	return ruleMap
+}
+
+func MeasIndex(line string) {
+
+}
+func ParseMeas(point string) string {
+	substrings := strings.Split(point, ",")
+	return substrings[0]
+}
+
+>>>>>>> ddf0be69c869da6c5baea6197110d12fbd2744f0
 // func (t Tags) Keys() []string {
 // 	var keys []string
 // 	for k, _ := range t {

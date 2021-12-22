@@ -6,10 +6,18 @@ import (
 )
 
 func TestTokenizationRule(t *testing.T) {
+<<<<<<< HEAD
 	ruleTokenizer := NewRuleTokenizer()
 	t.Run("test parsing rule to map with indexed tokens", func(t *testing.T) {
 		rule := "MEASUREMENT>region>app>FIELD"
 		// line := "stats,region=us-west,app=cart count=12"
+=======
+	rule := "MEASUREMENT>region>app>FIELD"
+	line := "stats,region=us-west,app=cart count=12"
+	// wantedMeas := "stats"
+	ruleTokenizer := NewRuleTokenizer(line)
+	t.Run("test parsing rule to map with indexed tokens", func(t *testing.T) {
+>>>>>>> ddf0be69c869da6c5baea6197110d12fbd2744f0
 		wantedRuleMap := &RuleMap{
 			[]Word{
 				{"MEASUREMENT", 0},
