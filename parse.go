@@ -6,8 +6,8 @@ import (
 )
 
 type RuleTokenizer struct {
-	line string
-	re   *regexp.Regexp
+	// line string
+	re *regexp.Regexp
 }
 
 type RuleMap struct {
@@ -25,9 +25,8 @@ type Op struct {
 	index int
 }
 
-func NewRuleTokenizer(line string) *RuleTokenizer {
+func NewRuleTokenizer() *RuleTokenizer {
 	return &RuleTokenizer{
-		line,
 		regexp.MustCompile(`(?P<words>[a-z A-Z _]+)|(?P<ops>[|>\s])`),
 	}
 }
