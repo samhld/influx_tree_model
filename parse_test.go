@@ -1,35 +1,40 @@
 package main
 
 import (
+	"reflect"
 	"testing"
 )
 
-// type validParse struct {
-// 	measurement string
-// 	tags        map[string]string
-// 	fields      map[string]interface{}
-// }
-
-func TestParseTree(t *testing.T) {
-
-}
-
 func TestTokenizationRule(t *testing.T) {
-	// rule := "MEASUREMENT,region,app FIELD"
-	point := "stats,region=us-west,app=cart count=12"
-	wantedMeas := "stats"
-	// wantedTagKeys := []string{"region", "app"}
-	// wantedTagVals := []string{"us-west", "cart"}
-	// wantedFieldKeys := []string{"count"}
-	// wantedFieldVals := []inferface{}{12}
-	// wantedField := map[string]interface{}{
-	// 	"count": 12,
-	// }
+	rule := "MEASUREMENT>region>app>FIELD"
+	line := "stats,region=us-west,app=cart count=12"
+	// wantedMeas := "stats"
+	ruleTokenizer := NewRuleTokenizer(line)
+	t.Run("test parsing rule to map with indexed tokens", func(t *testing.T) {
+		wantedRuleMap := &RuleMap{
+			[]Word{
+				{"MEASUREMENT", 0},
+				{"region", 2},
+				{"app", 4},
+				{"FIELD", 6},
+			},
+			[]Op{
+				{">", 1},
+				{">", 3},
+				{">", 5},
+			},
+		}
+		gotRuleMap := ruleTokenizer.Tokenize(rule)
+		if !reflect.DeepEqual(gotRuleMap, wantedRuleMap) {
+			t.Errorf("got %q want %q", gotRuleMap, wantedRuleMap)
+		}
 
-	t.Run("measurement", func(t *testing.T) {
-		gotMeas := ParseMeas(point)
-		assertEqualStrings(t, gotMeas, wantedMeas)
 	})
+
+	// t.Run("measurement", func(t *testing.T) {
+	// 	gotMeas := ParseMeas(point)
+	// 	assertEqualStrings(t, gotMeas, wantedMeas)
+	// })
 	// t.Run("get indices", func(t *testing.T) {
 	// 	measIndex := MeasIndex(point)
 	// tagsIndex := Rule.TagsIndex()
@@ -43,9 +48,9 @@ func TestTokenizationRule(t *testing.T) {
 
 }
 
-func assertEqualStrings(t testing.TB, got, want string) {
-	t.Helper()
-	if got != want {
-		t.Errorf("got %s, want %s", got, want)
-	}
-}
+// func assertEqualStrings(t testing.TB, got, want string) {
+// 	t.Helper()
+// 	if got != want {
+// 		t.Errorf("got %s, want %s", got, want)
+// 	}
+// }

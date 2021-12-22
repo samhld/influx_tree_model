@@ -1,15 +1,57 @@
 package main
 
 import (
+	"regexp"
 	"strings"
-	"unicode"
 )
 
-type Rule struct {
-	line             string
-	measurementIndex int
-	tagsIndices      []int
-	fieldsIndices    []int
+type RuleTokenizer struct {
+	line string
+	re   *regexp.Regexp
+}
+
+type RuleMap struct {
+	words []Word
+	ops   []Op
+}
+
+type Word struct {
+	text  string
+	index int
+}
+
+type Op struct {
+	text  string
+	index int
+}
+
+func NewRuleTokenizer(line string) *RuleTokenizer {
+	return &RuleTokenizer{
+		line,
+		regexp.MustCompile(`(?P<words>[a-z A-Z _]+)|(?P<ops>[|>\s])`),
+	}
+}
+func (t *RuleTokenizer) Tokenize(rule string) *RuleMap {
+	matches := t.re.FindAllStringSubmatch(rule, -1)
+	ruleMap := &RuleMap{}
+	for i, match := range matches {
+		if match[1] != "" { // 2nd position is a 'word'
+			word := Word{match[1], i}
+			ruleMap.words = append(ruleMap.words, word)
+		} else {
+			op := Op{match[2], i} // 3rd positioin is an 'op'
+			ruleMap.ops = append(ruleMap.ops, op)
+		}
+	}
+	return ruleMap
+}
+
+func MeasIndex(line string) {
+
+}
+func ParseMeas(point string) string {
+	substrings := strings.Split(point, ",")
+	return substrings[0]
 }
 
 type Line struct {
@@ -33,21 +75,6 @@ type Field struct {
 }
 type Tags map[string]string
 type Fields map[string]interface{}
-
-tokenizeRule(userRule string) {
-	f := func(c rune) bool {
-		return !unicode.IsLetter(c) && !unicode.IsNumber(c)
-	}
-	strings.FieldsFunc(line, f)
-}
-
-func MeasIndex(line string) {
-
-}
-func ParseMeas(point string) string {
-	substrings := strings.Split(point, ",")
-	return substrings[0]
-}
 
 // func (t Tags) Keys() []string {
 // 	var keys []string
