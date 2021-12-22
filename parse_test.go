@@ -24,32 +24,14 @@ func TestTokenizationRule(t *testing.T) {
 			},
 		}
 		gotRuleMap := ruleTokenizer.Tokenize(rule)
-		if !reflect.DeepEqual(gotRuleMap, wantedRuleMap) {
-			t.Errorf("got %q want %q", gotRuleMap, wantedRuleMap)
-		}
+		assertEqualRuleMaps(t, gotRuleMap, wantedRuleMap)
 
 	})
-
-	// t.Run("measurement", func(t *testing.T) {
-	// 	gotMeas := ParseMeas(point)
-	// 	assertEqualStrings(t, gotMeas, wantedMeas)
-	// })
-	// t.Run("get indices", func(t *testing.T) {
-	// 	measIndex := MeasIndex(point)
-	// tagsIndex := Rule.TagsIndex()
-	// fieldsIndex := Rule.FieldsIndex()
-	// })
-	// t.Run("tags", func(t *testing.T) {
-	// 	tags := ParseTags(point)
-	// 	gotTagKeys := ParseKeys(tags)
-	// 	gotTagVals := ParseVals(tags)
-	// })
-
 }
 
-// func assertEqualStrings(t testing.TB, got, want string) {
-// 	t.Helper()
-// 	if got != want {
-// 		t.Errorf("got %s, want %s", got, want)
-// 	}
-// }
+func assertEqualRuleMaps(t testing.TB, got, want *RuleMap) {
+	t.Helper()
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("Got %q\nWant %q\n", got, want)
+	}
+}
