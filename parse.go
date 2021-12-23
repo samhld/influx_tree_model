@@ -48,17 +48,20 @@ func (t *RuleTokenizer) Tokenize(rule string) *RuleMap {
 }
 
 func (t *RuleTokenizer) FindSiblings(rule string) [][]string {
-	var sibs [][]string
-	re := regexp.MustCompile(`[^>|]+\|[^>|]+`)
-	sibs = re.FindAllStringSubmatch(rule, -1)
-
-	// split sibling sets to slices instead of strings with pipes
+	detectedSibs := detectSiblingTokens(rule)
 	var siblings [][]string
-	for _, pipeSet := range sibs {
+	for _, pipeSet := range detectedSibs {
 		set := strings.Split(pipeSet[0], "|")
 		siblings = append(siblings, set)
 	}
 	return siblings
+}
+
+func detectSiblingTokens(rule string) [][]string {
+	var sibs [][]string
+	re := regexp.MustCompile(`[^>|]+\|[^>|]+`)
+	sibs = re.FindAllStringSubmatch(rule, -1)
+	return sibs
 }
 
 func MeasIndex(line string) {
