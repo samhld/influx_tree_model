@@ -8,30 +8,33 @@ func sortByCardinality(cardMap map[string]int) []string {
 	// var cardsToBeSorted []int
 	pairs := createTagCardinalityPairs(cardMap)
 	sort.Sort(pairs)
-
-	var tagsSorted []string
-	for _, pair := range pairs {
-		tagsSorted = append(tagsSorted, pair.Tag)
-	}
-
+	tagsSorted := createTagListFromPairs(pairs)
 	return tagsSorted
 }
 
 func createTagCardinalityPairs(cardMap map[string]int) TagCardPairList {
 	var pairs TagCardPairList
 	for k, v := range cardMap {
-		pair := TagCardPair{k, v}
+		pair := tagCardPair{k, v}
 		pairs = append(pairs, pair)
 	}
 	return pairs
 }
 
-type TagCardPair struct {
+func createTagListFromPairs(pairs TagCardPairList) []string {
+	var tagsSorted []string
+	for _, pair := range pairs {
+		tagsSorted = append(tagsSorted, pair.Tag)
+	}
+	return tagsSorted
+}
+
+type tagCardPair struct {
 	Tag         string
 	Cardinality int
 }
 
-type TagCardPairList []TagCardPair
+type TagCardPairList []tagCardPair
 
 // implement Sort interface on TagPairList
 // --------------------------------------------
