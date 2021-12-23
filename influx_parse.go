@@ -1,7 +1,11 @@
 package main
 
-import "sort"
+func sortByCardinality(cardMap map[string]int) []string {
+	// var cardsToBeSorted []int
+	var tagsSorted []string
+	// for k, v := cardMap {
 
-func sorted(cards []int) {
-	sort.Ints(cards)
+	// }
+	// sort.Ints(cards)
+	return tagsSorted
 }

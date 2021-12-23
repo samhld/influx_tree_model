@@ -5,8 +5,15 @@ import (
 )
 
 func TestOrdering(t *testing.T) {
-	cards := []int{5, 6, 1, 2, 7, 3}
-	sorted(cards)
-	wantSorted := []int{1, 2, 3, 5, 6, 7}
-	assertEqual(t, cards, wantSorted)
+	cardMap := map[string]int{
+		"tag1": 4,
+		"tag2": 3,
+		"tag3": 5,
+		"tag4": 1,
+	}
+	gotSortedTags := sortByCardinality(cardMap)
+	wantSortedTags := []string{"tag4", "tag2", "tag1", "tag3"}
+
+	assertEqual(t, gotSortedTags, wantSortedTags)
+
 }
