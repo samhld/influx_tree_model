@@ -6,13 +6,7 @@ import (
 
 func sortByCardinality(cardMap map[string]int) []string {
 	// var cardsToBeSorted []int
-
-	var pairs TagCardPairList
-
-	for k, v := range cardMap {
-		pair := TagCardPair{k, v}
-		pairs = append(pairs, pair)
-	}
+	pairs := createTagCardinalityPairs(cardMap)
 	sort.Sort(pairs)
 
 	var tagsSorted []string
@@ -21,6 +15,15 @@ func sortByCardinality(cardMap map[string]int) []string {
 	}
 
 	return tagsSorted
+}
+
+func createTagCardinalityPairs(cardMap map[string]int) TagCardPairList {
+	var pairs TagCardPairList
+	for k, v := range cardMap {
+		pair := TagCardPair{k, v}
+		pairs = append(pairs, pair)
+	}
+	return pairs
 }
 
 type TagCardPair struct {
