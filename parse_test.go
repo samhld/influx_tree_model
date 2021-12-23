@@ -50,7 +50,9 @@ func TestTokenizationRule(t *testing.T) {
 	t.Run("test siblings", func(t *testing.T) {
 		rule := "MEASUREMENT>region>host|app>sib1|sib2>FIELD"
 		ruleTokenizer := NewRuleTokenizer()
-		want := []string{"host", "app"}
+		want := [][]string{
+			{"host", "app"},
+			{"sib1", "sib2"}}
 		got := ruleTokenizer.FindSiblings(rule)
 
 		assertEqual(t, got, want)

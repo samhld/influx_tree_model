@@ -47,11 +47,17 @@ func (t *RuleTokenizer) Tokenize(rule string) *RuleMap {
 	return ruleMap
 }
 
-func (t *RuleTokenizer) FindSiblings(rule string) []string {
+func (t *RuleTokenizer) FindSiblings(rule string) [][]string {
 	var sibs [][]string
-	re := regexp.MustCompile(`(?P<siblings>[a-z A-Z _]+\|[a-z A-Z _]+)`)
+	re := regexp.MustCompile(`[^>|]+\|[^>|]+`)
 	sibs = re.FindAllStringSubmatch(rule, -1)
-	siblings := sibs[0]
+
+	// split sibling sets to slices instead of strings with pipes
+	var siblings [][]string
+	for _, pipeSet := range sibs {
+		set := strings.Split(pipeSet[0], "|")
+		siblings = append(siblings, set)
+	}
 	return siblings
 }
 
