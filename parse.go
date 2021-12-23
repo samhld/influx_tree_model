@@ -16,8 +16,9 @@ type RuleMap struct {
 }
 
 type Word struct {
-	text  string
-	index int
+	text    string
+	index   int
+	sibling *Word
 }
 
 type Op struct {
@@ -36,7 +37,7 @@ func (t *RuleTokenizer) Tokenize(rule string) *RuleMap {
 	ruleMap := &RuleMap{}
 	for i, match := range matches {
 		if match[1] != "" { // 2nd position is a 'word'
-			word := Word{match[1], i}
+			word := Word{match[1], i, nil}
 			ruleMap.words = append(ruleMap.words, word)
 		} else {
 			op := Op{match[2], i}
@@ -44,6 +45,14 @@ func (t *RuleTokenizer) Tokenize(rule string) *RuleMap {
 		}
 	}
 	return ruleMap
+}
+
+func (t *RuleTokenizer) FindSiblings(rule string) []string {
+	var sibs [][]string
+	re := regexp.MustCompile(`(?P<siblings>[a-z A-Z _]+\|[a-z A-Z _]+)`)
+	sibs = re.FindAllStringSubmatch(rule, -1)
+	siblings := sibs[0]
+	return siblings
 }
 
 func MeasIndex(line string) {
