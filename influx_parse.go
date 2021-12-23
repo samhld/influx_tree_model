@@ -1,5 +1,7 @@
 package main
 
-func sorted(cards []int) []int {
-	return nil
+import "sort"
+
+func sorted(cards []int) {
+	sort.Ints(cards)
 }
