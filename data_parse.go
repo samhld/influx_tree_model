@@ -12,19 +12,25 @@ func getTagKeyValueCounts(queryAPI api.QueryAPI, flux, bucket, measurement strin
 	result, err := queryAPI.Query(context.Background(), flux)
 	checkQueryError(err)
 
-	keyValMap := make(map[string]int64)
+	keyValCountMap := make(map[string]int64)
 	for result.Next() {
 		record := result.Record()
 		tag := fmt.Sprintf("%v", record.ValueByKey("tag")) //"tag" is a column injected via the Flux query
 		val := record.Value().(int64)
-		keyValMap[tag] = val
+		keyValCountMap[tag] = val
 		// resultList = append(resultList, recordString)
 	}
 
-	return keyValMap
+	return keyValCountMap
 }
 
-func getAllTagValues(tagKeys []string) {
+func mapKeysToValues(tagKeys []string, allVals [][]string) map[string][]string {
+	// assumes tagKeys and allValls have relating indices
+	m := make(map[string][]string)
+	for i, key := range tagKeys {
+		m[key] = allVals[i]
+	}
+	return m
 }
 
 func getTagKeyValues(queryAPI api.QueryAPI, flux string) []string {

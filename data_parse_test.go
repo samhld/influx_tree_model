@@ -11,7 +11,7 @@ func TestParse(t *testing.T) {
 		k2v := []string{"v1", "v2"}
 		allVals := [][]string{k1v, k2v}
 
-		gotMap := mapKeysToValues()
+		gotMap := mapKeysToValues(keys, allVals)
 		wantMap := map[string][]string{
 			"k1": []string{"v1", "v2", "v3"},
 			"k2": []string{"v1", "v2"},
