@@ -13,18 +13,21 @@ func main() {
 	token := os.Getenv("INFLUX_REMOTE_TOKEN")
 	url := os.Getenv("INFLUX_REMOTE_HOST")
 	measurement := "test"
-
-	byteFlux, err := os.ReadFile("tag_key_value_counts_by_measurement.flux")
-	if err != nil {
-		panic(err)
-	}
-	strFlux := fmt.Sprintf(string(byteFlux), bucket, measurement)
 	client := influxdb2.NewClient(url, token)
 	queryAPI := client.QueryAPI(org)
 
-	keyValMap := getTagKeyValueCounts(queryAPI, strFlux, bucket, measurement)
+	rawFlux := readFlux("tag_key_value_counts_by_measurement.flux")
+	flux := fmt.Sprintf(rawFlux, bucket, measurement)
+
+	keyValMap := getTagKeyValueCounts(queryAPI, flux, bucket, measurement)
 
 	sorted := sortByCardinality(keyValMap)
 
 	fmt.Println(sorted)
+
+	tag := "tag1"
+	rawFlux = readFlux("all_tag_values_by_tag.flux")
+	flux = fmt.Sprintf(rawFlux, bucket, tag)
+	keyVals := getTagKeyValues(queryAPI, flux)
+	fmt.Println(keyVals)
 }
