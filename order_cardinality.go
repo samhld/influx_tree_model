@@ -4,7 +4,7 @@ import (
 	"sort"
 )
 
-func sortByCardinality(cardMap map[string]int) []string {
+func sortByCardinality(cardMap map[string]int64) []string {
 	// var cardsToBeSorted []int
 	pairs := createTagCardinalityPairs(cardMap)
 	sort.Sort(pairs)
@@ -12,7 +12,7 @@ func sortByCardinality(cardMap map[string]int) []string {
 	return tagsSorted
 }
 
-func createTagCardinalityPairs(cardMap map[string]int) TagCardPairList {
+func createTagCardinalityPairs(cardMap map[string]int64) TagCardPairList {
 	var pairs TagCardPairList
 	for k, v := range cardMap {
 		pair := tagCardPair{k, v}
@@ -31,7 +31,7 @@ func createTagListFromPairs(pairs TagCardPairList) []string {
 
 type tagCardPair struct {
 	Tag         string
-	Cardinality int
+	Cardinality int64
 }
 
 type TagCardPairList []tagCardPair

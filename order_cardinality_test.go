@@ -6,7 +6,7 @@ import (
 
 func TestOrdering(t *testing.T) {
 	t.Run("test sorting out-of-order", func(t *testing.T) {
-		cardMap := map[string]int{
+		cardMap := map[string]int64{
 			"tag1": 4,
 			"tag2": 3,
 			"tag3": 5,
@@ -18,7 +18,7 @@ func TestOrdering(t *testing.T) {
 		assertEqual(t, gotSortedTags, wantSortedTags)
 	})
 	t.Run("test return already-sorted", func(t *testing.T) {
-		cardMap := map[string]int{
+		cardMap := map[string]int64{
 			"tag1": 1,
 			"tag2": 2,
 			"tag3": 3,

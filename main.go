@@ -22,5 +22,9 @@ func main() {
 	client := influxdb2.NewClient(url, token)
 	queryAPI := client.QueryAPI(org)
 
-	getTagKeyValueCounts(queryAPI, strFlux, bucket, measurement)
+	keyValMap := getTagKeyValueCounts(queryAPI, strFlux, bucket, measurement)
+
+	sorted := sortByCardinality(keyValMap)
+
+	fmt.Println(sorted)
 }

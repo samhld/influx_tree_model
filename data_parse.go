@@ -21,5 +21,5 @@ func getTagKeyValueCounts(queryAPI api.QueryAPI, flux, bucket, measurement strin
 		// resultList = append(resultList, recordString)
 	}
 
-	fmt.Println(keyValMap)
+	return keyValMap
 }
