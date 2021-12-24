@@ -8,20 +8,50 @@ import (
 	api "github.com/influxdata/influxdb-client-go/v2/api"
 )
 
-func getTagKeyValueCounts(queryAPI api.QueryAPI, flux, bucket, measurement string) map[string]int64 {
-	result, err := queryAPI.Query(context.Background(), flux)
+type dataGetter interface {
+	getTagKeyValues(flux string) []string
+	getTagKeyValueCounts(flux string) map[string]int64
+}
+
+type MeasurementAPI struct {
+	api         api.QueryAPI
+	bucket      string
+	measurement string
+	// tagKeys          []string
+	keyValCountMap map[string]int64
+	// keyValsMap       make(map[string][]string)
+	fluxGetValCounts string
+	// fluxGetVals    string
+
+}
+
+func NewMeasurementAPI(queryAPI api.QueryAPI, bucket, measurement string) *MeasurementAPI {
+	mAPI := &MeasurementAPI{}
+	mAPI.api = queryAPI
+	mAPI.bucket = bucket
+	mAPI.measurement = measurement
+	mAPI.keyValCountMap = make(map[string]int64)
+	flux := readFlux("tag_key_value_counts_by_measurement.flux")
+	mAPI.fluxGetValCounts = fmt.Sprintf(flux, bucket, measurement)
+
+	return mAPI
+
+	// mAPI.fluxGetVals := readFlux("all_tag_value_by_tag.flux")
+}
+
+func (m *MeasurementAPI) getTagKeyValueCounts() map[string]int64 {
+	result, err := m.api.Query(context.Background(), m.fluxGetValCounts)
 	checkQueryError(err)
 
-	keyValCountMap := make(map[string]int64)
 	for result.Next() {
 		record := result.Record()
 		tag := fmt.Sprintf("%v", record.ValueByKey("tag")) //"tag" is a column injected via the Flux query
 		val := record.Value().(int64)
-		keyValCountMap[tag] = val
+		m.keyValCountMap[tag] = val
 		// resultList = append(resultList, recordString)
 	}
 
-	return keyValCountMap
+	return m.keyValCountMap
 }
 
 func mapKeysToValues(tagKeys []string, allVals [][]string) map[string][]string {
@@ -33,8 +63,8 @@ func mapKeysToValues(tagKeys []string, allVals [][]string) map[string][]string {
 	return m
 }
 
-func getTagKeyValues(queryAPI api.QueryAPI, flux string) []string {
-	result, err := queryAPI.Query(context.Background(), flux)
+func (m *MeasurementAPI) getTagKeyValues(flux string) []string {
+	result, err := m.api.Query(context.Background(), flux)
 	checkQueryError(err)
 
 	var vals []string
