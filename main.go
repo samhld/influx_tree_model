@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"os"
 
@@ -20,42 +19,34 @@ func main() {
 
 	queryAPI := client.QueryAPI(org)
 
-	fluxGetTagValuesPerKey := fmt.Sprintf(`import "influxdata/influxdb/schema"
-											schema.tagValues(bucket: "%s", tag: "%s")
-											|> count()`,
-		bucket,
-		tag)
-
 	tagKeysResult, err := getBucketTagKeys(queryAPI, bucket)
 
 	keyResultList, _ := readResults(tagKeysResult)
 	fmt.Println(keyResultList)
 
+	tagValues, err := getTagKeyValues(queryAPI, bucket, tag)
+	if err != nil {
+		panic(err)
+	}
+	valuesList, err := readResults(tagValues)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(valuesList)
+	// fmt.Printf("result: %v\n", result)
 	// if err == nil {
 	// 	// Iterate over query response
-	// 	for tagKeysResult.Next() {
-	// 		fmt.Printf("key result: %q", tagKeysResult)
+	// 	for result.Next() {
+	// 		fmt.Printf("value: %v\n", result.Record().Value())
+	// 	}
+	// 	// Check for an error
+	// 	if result.Err() != nil {
+	// 		fmt.Printf("query parsing error: %s\n", result.Err().Error())
 	// 	}
 	// } else {
 	// 	panic(err)
 	// }
-
-	// fmt.Printf("tag keys: %q\n", tagKeys)
-
-	result, err := queryAPI.Query(context.Background(), fluxGetTagValuesPerKey)
-	fmt.Printf("result: %v\n", result)
-	if err == nil {
-		// Iterate over query response
-		for result.Next() {
-			fmt.Printf("value: %v\n", result.Record().Value())
-		}
-		// Check for an error
-		if result.Err() != nil {
-			fmt.Printf("query parsing error: %s\n", result.Err().Error())
-		}
-	} else {
-		panic(err)
-	}
 	// Ensures background processes finishes
 	client.Close()
 }

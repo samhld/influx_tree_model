@@ -27,3 +27,13 @@ func getBucketTagKeys(queryAPI api.QueryAPI, bucket string) (*api.QueryTableResu
 
 	return queryAPI.Query(context.Background(), flux)
 }
+
+func getTagKeyValues(queryAPI api.QueryAPI, bucket, tagKey string) (*api.QueryTableResult, error) {
+	flux := fmt.Sprintf(`import "influxdata/influxdb/schema"
+						schema.tagValues(bucket: "%s", tag: "%s")
+						|> count()`,
+		bucket,
+		tagKey)
+
+	return queryAPI.Query(context.Background(), flux)
+}
