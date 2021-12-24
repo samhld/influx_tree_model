@@ -24,6 +24,9 @@ func getTagKeyValueCounts(queryAPI api.QueryAPI, flux, bucket, measurement strin
 	return keyValMap
 }
 
+func getAllTagValues(tagKeys []string) {
+}
+
 func getTagKeyValues(queryAPI api.QueryAPI, flux string) []string {
 	result, err := queryAPI.Query(context.Background(), flux)
 	checkQueryError(err)
