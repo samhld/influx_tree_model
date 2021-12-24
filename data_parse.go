@@ -7,33 +7,19 @@ import (
 	api "github.com/influxdata/influxdb-client-go/v2/api"
 )
 
-func readResults(result *api.QueryTableResult) ([]interface{}, error) {
-	var resultList []interface{}
-	// Iterate over query response
+func getTagKeyValueCounts(queryAPI api.QueryAPI, flux, bucket, measurement string) map[string]int64 {
+	result, err := queryAPI.Query(context.Background(), flux)
+	if err != nil {
+		fmt.Printf("Error querying for tag values: %v", err)
+	}
+	keyValMap := make(map[string]int64)
 	for result.Next() {
-		resultList = append(resultList, result.Record().Value())
+		record := result.Record()
+		tag := fmt.Sprintf("%v", record.ValueByKey("tag")) //"tag" is a column injected via the Flux query
+		val := record.Value().(int64)
+		keyValMap[tag] = val
+		// resultList = append(resultList, recordString)
 	}
-	// Check for an error
-	if result.Err() != nil {
-		return nil, result.Err()
-	}
-	return resultList, nil
-}
 
-func getBucketTagKeys(queryAPI api.QueryAPI, bucket string) (*api.QueryTableResult, error) {
-	flux := fmt.Sprintf(`import "influxdata/influxdb/schema"
-						schema.tagKeys(bucket: "%s")`,
-		bucket)
-
-	return queryAPI.Query(context.Background(), flux)
-}
-
-func getTagKeyValues(queryAPI api.QueryAPI, bucket, tagKey string) (*api.QueryTableResult, error) {
-	flux := fmt.Sprintf(`import "influxdata/influxdb/schema"
-						schema.tagValues(bucket: "%s", tag: "%s")
-						|> count()`,
-		bucket,
-		tagKey)
-
-	return queryAPI.Query(context.Background(), flux)
+	fmt.Println(keyValMap)
 }
