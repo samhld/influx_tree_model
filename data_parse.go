@@ -21,8 +21,7 @@ type MeasurementAPI struct {
 	keyValCountMap map[string]int64
 	// keyValsMap       make(map[string][]string)
 	fluxGetValCounts string
-	// fluxGetVals    string
-
+	fluxGetVals      string
 }
 
 func NewMeasurementAPI(queryAPI api.QueryAPI, bucket, measurement string) *MeasurementAPI {
@@ -33,6 +32,7 @@ func NewMeasurementAPI(queryAPI api.QueryAPI, bucket, measurement string) *Measu
 	mAPI.keyValCountMap = make(map[string]int64)
 	flux := readFlux("tag_key_value_counts_by_measurement.flux")
 	mAPI.fluxGetValCounts = fmt.Sprintf(flux, bucket, measurement)
+	mAPI.fluxGetVals = readFlux("all_tag_values_by_tag.flux") // store injectable flux
 
 	return mAPI
 
@@ -48,7 +48,6 @@ func (m *MeasurementAPI) getTagKeyValueCounts() map[string]int64 {
 		tag := fmt.Sprintf("%v", record.ValueByKey("tag")) //"tag" is a column injected via the Flux query
 		val := record.Value().(int64)
 		m.keyValCountMap[tag] = val
-		// resultList = append(resultList, recordString)
 	}
 
 	return m.keyValCountMap
@@ -63,8 +62,9 @@ func mapKeysToValues(tagKeys []string, allVals [][]string) map[string][]string {
 	return m
 }
 
-func (m *MeasurementAPI) getTagKeyValues(flux string) []string {
-	result, err := m.api.Query(context.Background(), flux)
+func (m *MeasurementAPI) getTagKeyValues(tag string) []string {
+	m.fluxGetVals = fmt.Sprintf(m.fluxGetVals, m.bucket, tag)
+	result, err := m.api.Query(context.Background(), m.fluxGetVals)
 	checkQueryError(err)
 
 	var vals []string
