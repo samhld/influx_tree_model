@@ -18,10 +18,11 @@ type MeasurementAPI struct {
 	bucket      string
 	measurement string
 	// tagKeys          []string
-	keyValCountMap map[string]int64
-	// keyValsMap       make(map[string][]string)
+	keyValCountMap   map[string]int64 // map so not sorted -- must sort ad hoc to use
+	keyValsMap       map[string][]string
 	fluxGetValCounts string
 	fluxGetVals      string
+	fluxGetKeys      string
 }
 
 func NewMeasurementAPI(queryAPI api.QueryAPI, bucket, measurement string) *MeasurementAPI {
@@ -30,18 +31,21 @@ func NewMeasurementAPI(queryAPI api.QueryAPI, bucket, measurement string) *Measu
 	mAPI.bucket = bucket
 	mAPI.measurement = measurement
 	mAPI.keyValCountMap = make(map[string]int64)
+	mAPI.keyValsMap = make(map[string][]string)
 	flux := readFlux("tag_key_value_counts_by_measurement.flux")
 	mAPI.fluxGetValCounts = fmt.Sprintf(flux, bucket, measurement)
 	mAPI.fluxGetVals = readFlux("all_tag_values_by_tag.flux") // store injectable flux
+	flux = readFlux("tag_keys_by_measurement.flux")
+	mAPI.fluxGetKeys = fmt.Sprintf(flux, bucket, measurement)
 
 	return mAPI
-
-	// mAPI.fluxGetVals := readFlux("all_tag_value_by_tag.flux")
 }
 
 func (m *MeasurementAPI) getTagKeyValueCounts() map[string]int64 {
 	result, err := m.api.Query(context.Background(), m.fluxGetValCounts)
-	checkQueryError(err)
+	if err != nil {
+		fmt.Printf("error querying for tag key value counts: %v", err)
+	}
 
 	for result.Next() {
 		record := result.Record()
@@ -63,10 +67,12 @@ func mapKeysToValues(tagKeys []string, allVals [][]string) map[string][]string {
 }
 
 func (m *MeasurementAPI) getTagKeyValues(tag string) []string {
-	m.fluxGetVals = fmt.Sprintf(m.fluxGetVals, m.bucket, tag)
-	result, err := m.api.Query(context.Background(), m.fluxGetVals)
-	checkQueryError(err)
-
+	fluxGetVals := fmt.Sprintf(m.fluxGetVals, m.bucket, tag)
+	result, err := m.api.Query(context.Background(), fluxGetVals)
+	if err != nil {
+		fmt.Printf("error querying for tag key values: %v", err)
+	}
+	// checkQueryError(err)
 	var vals []string
 	for result.Next() {
 		checkQueryError(result.Err())
@@ -76,9 +82,24 @@ func (m *MeasurementAPI) getTagKeyValues(tag string) []string {
 	return vals
 }
 
+func (m *MeasurementAPI) getTagKeys() []string {
+	result, err := m.api.Query(context.Background(), m.fluxGetKeys)
+	if err != nil {
+		fmt.Printf("error querying for tag keys: %v", err)
+	}
+	// checkQueryError(err)
+	var keys []string
+	for result.Next() {
+		key := fmt.Sprintf("%v", result.Record().Value())
+		keys = append(keys, key)
+	}
+
+	return keys
+}
+
 func checkQueryError(err error) {
 	if err != nil {
-		fmt.Printf("Error querying for tag values: %v", err)
+		fmt.Printf("Error querying: %v", err)
 	}
 }
 

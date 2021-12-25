@@ -17,11 +17,18 @@ func main() {
 	queryAPI := client.QueryAPI(org)
 
 	measAPI := NewMeasurementAPI(queryAPI, bucket, measurement)
-	keyValMap := measAPI.getTagKeyValueCounts()
-	sorted := sortByCardinality(keyValMap)
+	measAPI.keyValCountMap = measAPI.getTagKeyValueCounts()
+	sorted := sortByCardinality(measAPI.keyValCountMap)
 	fmt.Println(sorted)
 
-	tag := "tag1"
-	keyVals := measAPI.getTagKeyValues(tag)
-	fmt.Println(keyVals)
+	tagKeys := measAPI.getTagKeys()
+	fmt.Println(tagKeys)
+
+	for _, key := range tagKeys {
+		keyVals := measAPI.getTagKeyValues(key)
+		measAPI.keyValsMap[key] = keyVals
+	}
+
+	fmt.Printf("keyValCountMap: %v\n", measAPI.keyValCountMap)
+	fmt.Printf("keyValMap: %v\n", measAPI.keyValsMap)
 }
