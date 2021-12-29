@@ -22,6 +22,8 @@ Example:
 
 2) A user can input their own defintion of the hierarchy and, in doing so, can also define sibling relationships.  Sibling relationships will be on the same level and are simply different ways of slicing up data in the tree.
 
+FIELD must always be the last element (lowest/leaf tier).
+
 Proposals for user input:
 * `MEASUREMENT,region,{host,app},FIELD`
 * `MEASUREMENT>region>{host|app},FIELD`
@@ -134,3 +136,7 @@ app
                 └──available
                 └──used
 ```
+
+### More brief examples
+Field is top level, ignore:
+Rule: `FIELD>region>host`

@@ -5,6 +5,13 @@ import (
 	"strings"
 )
 
+type TokenTag struct {
+	key    string
+	values []string
+	parent string
+	child  string
+}
+
 type RuleTokenizer struct {
 	// line string
 	re *regexp.Regexp
@@ -65,8 +72,8 @@ func detectSiblingTokens(rule string) [][]string {
 }
 
 func MeasIndex(line string) {
-
 }
+
 func ParseMeas(point string) string {
 	substrings := strings.Split(point, ",")
 	return substrings[0]
@@ -99,8 +106,11 @@ type Field struct {
 	Value interface{}
 	Index int
 }
-type Tags map[string]string
-type Fields map[string]interface{}
+
+type (
+	Tags   map[string]string
+	Fields map[string]interface{}
+)
 
 // func (t Tags) Keys() []string {
 // 	var keys []string
