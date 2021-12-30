@@ -21,7 +21,3 @@ func (m *Measurement) Tier() int {
 func (m *Measurement) Text() string {
 	return m.text
 }
-
-// type Tree struct {
-// 	route
-// }

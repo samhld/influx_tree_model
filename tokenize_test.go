@@ -26,7 +26,7 @@ func TestTokenizationRule(t *testing.T) {
 		gotTokenizedRule := ruleTokenizer.Tokenize(rule)
 		assertEqual(t, gotTokenizedRule, wantedTokenizedRule)
 	})
-	t.Run("test parsing rule to map with pipe op", func(t *testing.T) {
+	t.Run("test making TokenizedRule with pipe op", func(t *testing.T) {
 		rule := "MEASUREMENT>region>host|app>FIELD"
 		wantedTokenizedRule := &TokenizedRule{
 			[]Word{
