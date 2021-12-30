@@ -40,6 +40,23 @@ func NewRuleTokenizer() *RuleTokenizer {
 	}
 }
 
+func MapTokensToData(measAPI *MeasurementAPI, tokenizedRule *TokenizedRule) Tree {
+	tree := make(Tree)
+	for i, word := range tokenizedRule.words {
+		switch word.text {
+		case "MEASUREMENT":
+			tree[i] = &Measurement{measAPI.measurement, i}
+		case "FIELD":
+			tree[i] = &Field{"FIELD", i}
+		default:
+			vals := measAPI.getTagKeyValues(word.text)
+			tree[i] = &Key{word.text, i, vals, nil, nil}
+		}
+	}
+
+	return tree
+}
+
 func (t *RuleTokenizer) Tokenize(rule string) *TokenizedRule {
 	matches := t.re.FindAllStringSubmatch(rule, -1)
 	tokenized := &TokenizedRule{}

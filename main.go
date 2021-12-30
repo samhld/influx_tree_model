@@ -9,30 +9,7 @@ import (
 
 func main() {
 	measAPI, tokenizedRule := setup()
-	// field := "value"
-	// stub := &Stub{
-	// 	[]string{"app", "region"},
-	// 	[]string{"v1", "v2", "v3"},
-	// 	[]string{"v1", "v2"},
-	// 	3,
-	// 	2,
-	// }
-	measAPI.setKeyValsMap()
-	// keyValsMap := measAPI.keyValsMap
-	tree := make(Tree)
-	for i, word := range tokenizedRule.words {
-		switch word.text {
-		case "MEASUREMENT":
-			tree[i] = &Measurement{measAPI.measurement, i}
-		case "FIELD":
-			tree[i] = &Field{"FIELD", i}
-		default:
-			vals := measAPI.getTagKeyValues(word.text)
-			fmt.Printf("vals: %q\n", vals)
-			tree[i] = &Key{word.text, i, vals, nil, nil}
-		}
-	}
-
+	tree := MapTokensToData(measAPI, tokenizedRule)
 	fmt.Printf("%q", tree)
 }
 
@@ -49,7 +26,6 @@ func setup() (*MeasurementAPI, *TokenizedRule) {
 	queryAPI := client.QueryAPI(org)
 
 	measAPI := NewMeasurementAPI(queryAPI, bucket, measurement)
-	measAPI.setKeyValsMap()
 
 	return measAPI, tokenizedRule
 }
