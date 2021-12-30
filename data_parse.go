@@ -41,6 +41,14 @@ func NewMeasurementAPI(queryAPI api.QueryAPI, bucket, measurement string) *Measu
 	return mAPI
 }
 
+func (m *MeasurementAPI) setKeyValsMap() {
+	tagKeys := m.getTagKeys()
+	for _, key := range tagKeys {
+		keyVals := m.getTagKeyValues(key)
+		m.keyValsMap[key] = keyVals
+	}
+}
+
 func (m *MeasurementAPI) getTagKeyValueCounts() map[string]int64 {
 	result, err := m.api.Query(context.Background(), m.fluxGetValCounts)
 	if err != nil {

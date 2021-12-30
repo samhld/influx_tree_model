@@ -10,7 +10,7 @@ func TestTokenizationRule(t *testing.T) {
 	ruleTokenizer := NewRuleTokenizer()
 	t.Run("test parsing rule to map with indexed tokens", func(t *testing.T) {
 		rule := "MEASUREMENT>region>app>FIELD"
-		wantedRuleMap := &RuleMap{
+		wantedTokenizedRule := &TokenizedRule{
 			[]Word{
 				{"MEASUREMENT", 0, nil},
 				{"region", 2, nil},
@@ -23,13 +23,12 @@ func TestTokenizationRule(t *testing.T) {
 				{">", 5},
 			},
 		}
-		gotRuleMap := ruleTokenizer.Tokenize(rule)
-		assertEqual(t, gotRuleMap, wantedRuleMap)
-
+		gotTokenizedRule := ruleTokenizer.Tokenize(rule)
+		assertEqual(t, gotTokenizedRule, wantedTokenizedRule)
 	})
 	t.Run("test parsing rule to map with pipe op", func(t *testing.T) {
 		rule := "MEASUREMENT>region>host|app>FIELD"
-		wantedRuleMap := &RuleMap{
+		wantedTokenizedRule := &TokenizedRule{
 			[]Word{
 				{"MEASUREMENT", 0, nil},
 				{"region", 2, nil},
@@ -44,15 +43,16 @@ func TestTokenizationRule(t *testing.T) {
 				{">", 7},
 			},
 		}
-		gotRuleMap := ruleTokenizer.Tokenize(rule)
-		assertEqual(t, gotRuleMap, wantedRuleMap)
+		gotTokenizedRule := ruleTokenizer.Tokenize(rule)
+		assertEqual(t, gotTokenizedRule, wantedTokenizedRule)
 	})
 	t.Run("test siblings", func(t *testing.T) {
 		rule := "MEASUREMENT>region>host|app>sib1|sib2>FIELD"
 		ruleTokenizer := NewRuleTokenizer()
 		want := [][]string{
 			{"host", "app"},
-			{"sib1", "sib2"}}
+			{"sib1", "sib2"},
+		}
 		got := ruleTokenizer.FindSiblings(rule)
 
 		assertEqual(t, got, want)

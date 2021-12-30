@@ -17,7 +17,8 @@ type RuleTokenizer struct {
 	re *regexp.Regexp
 }
 
-type RuleMap struct {
+type TokenizedRule struct {
+	// words []Word
 	words []Word
 	ops   []Op
 }
@@ -39,19 +40,27 @@ func NewRuleTokenizer() *RuleTokenizer {
 	}
 }
 
-func (t *RuleTokenizer) Tokenize(rule string) *RuleMap {
+func (t *RuleTokenizer) Tokenize(rule string) *TokenizedRule {
 	matches := t.re.FindAllStringSubmatch(rule, -1)
-	ruleMap := &RuleMap{}
+	tokenized := &TokenizedRule{}
 	for i, match := range matches {
-		if match[1] != "" { // 2nd position is a 'word'
+		if match[1] != "" { // 2nd position of match tuple represents a 'word' if not zero-value
 			word := Word{match[1], i, nil}
-			ruleMap.words = append(ruleMap.words, word)
+			// switch word {
+			// case "MEASUREMENT":
+			// 	meas := Measurement{word, i}
+			// case "FIELD":
+			// 	field := Field{word, i}
+			// default:
+			// 	tag := Key{word, i, nil, nil, nil}
+			// 	tokenized.tags = append(tokenized.tags, tag)
+			tokenized.words = append(tokenized.words, word)
 		} else {
 			op := Op{match[2], i}
-			ruleMap.ops = append(ruleMap.ops, op)
+			tokenized.ops = append(tokenized.ops, op)
 		}
 	}
-	return ruleMap
+	return tokenized
 }
 
 func (t *RuleTokenizer) FindSiblings(rule string) [][]string {
@@ -93,24 +102,11 @@ type Line struct {
 	Fields      []Field
 }
 
-type Measurement string
-
 type Tag struct {
 	Key   string
 	Value string
 	Index int
 }
-
-type Field struct {
-	Key   string
-	Value interface{}
-	Index int
-}
-
-type (
-	Tags   map[string]string
-	Fields map[string]interface{}
-)
 
 // func (t Tags) Keys() []string {
 // 	var keys []string
