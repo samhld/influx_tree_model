@@ -33,21 +33,42 @@ func NewRuleTokenizer() *RuleTokenizer {
 	}
 }
 
-func MapTokensToData(measAPI *MeasurementAPI, tokenizedRule *TokenizedRule) map[int]Node {
-	tree := make(map[int]Node)
+func createBranches(tiers Tiers, fieldKeys []string) []Branch {
+	var branches []Branch
+	for f, _ := range fieldKeys {
+		var branch []string
+		t := 0
+		for t < len(tiers) {
+			node := tiers[t]
+			switch v := node.(type) {
+			case *Tag:
+				branch[t] = v.key.text
+				branch[t+1] = v.value.text
+			case *Field:
+				branch[t] = fieldKeys[f]
+			}
+		}
+	}
+	return branches
+}
+
+func MapTokensToData(measAPI *MeasurementAPI, tokenizedRule *TokenizedRule) Tiers {
+	tiers := make(Tiers)
 	for i, word := range tokenizedRule.words {
 		switch word.text {
 		case "MEASUREMENT":
-			tree[i] = &Measurement{measAPI.measurement, i}
+			tiers[i] = &Measurement{measAPI.measurement, i}
 		case "FIELD":
-			tree[i] = &Field{"FIELD", i}
+			fieldKeys := measAPI.getFieldKeys()
+			// tiers[i] = []&Field{"FIELD", i}
+			tiers[i] = fieldKeys
 		default:
 			vals := measAPI.getTagKeyValues(word.text)
-			tree[i] = &Key{word.text, i, vals, nil, nil}
+			tiers[i] = &Key{word.text, i, vals, nil, nil}
 		}
 	}
 
-	return tree
+	return tiers
 }
 
 func (t *RuleTokenizer) Tokenize(rule string) *TokenizedRule {

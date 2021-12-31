@@ -2,7 +2,15 @@ package main
 
 import "fmt"
 
-type Tree map[int]Node
+type Tree []Branch
+
+type Branch struct {
+	measurement Measurement
+	tags        []Tag // appended to in order as the source will be ordered
+	field       Field
+}
+
+type Tiers map[int]interface{}
 
 // func (tr *Tree) createTiers(numTiers int)
 
@@ -32,6 +40,14 @@ type Tag struct {
 
 func (t *Tag) String() string {
 	return fmt.Sprintf("%s: %s\n", t.key.Text(), t.value.Text())
+}
+
+func (t *Tag) Tier() int {
+	return t.key.tier
+}
+
+func (t *Tag) Text() string {
+	return t.key.text
 }
 
 // Key struct impls Node interface
