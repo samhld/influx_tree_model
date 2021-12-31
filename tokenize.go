@@ -5,13 +5,6 @@ import (
 	"strings"
 )
 
-type TokenTag struct {
-	key    string
-	values []string
-	parent string
-	child  string
-}
-
 type RuleTokenizer struct {
 	// line string
 	re *regexp.Regexp
@@ -40,8 +33,8 @@ func NewRuleTokenizer() *RuleTokenizer {
 	}
 }
 
-func MapTokensToData(measAPI *MeasurementAPI, tokenizedRule *TokenizedRule) Tree {
-	tree := make(Tree)
+func MapTokensToData(measAPI *MeasurementAPI, tokenizedRule *TokenizedRule) map[int]Node {
+	tree := make(map[int]Node)
 	for i, word := range tokenizedRule.words {
 		switch word.text {
 		case "MEASUREMENT":

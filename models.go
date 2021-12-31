@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 type Tree map[int]Node
 
 // func (tr *Tree) createTiers(numTiers int)
@@ -21,6 +23,15 @@ func (m *Measurement) Tier() int {
 
 func (m *Measurement) Text() string {
 	return m.text
+}
+
+type Tag struct {
+	key   Key
+	value Value
+}
+
+func (t *Tag) String() string {
+	return fmt.Sprintf("%s: %s\n", t.key.Text(), t.value.Text())
 }
 
 // Key struct impls Node interface
