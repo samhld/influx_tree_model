@@ -58,10 +58,12 @@ func (m *MeasurementAPI) getTagKeyValueCounts() map[string]int64 {
 	for result.Next() {
 		record := result.Record()
 		tag := fmt.Sprintf("%v", record.ValueByKey("tag")) //"tag" is a column injected via the Flux query
+		if tag == "_measurement" || tag == "_field" {
+			continue
+		}
 		val := record.Value().(int64)
 		m.keyValCountMap[tag] = val
 	}
-
 	return m.keyValCountMap
 }
 
@@ -99,7 +101,12 @@ func (m *MeasurementAPI) getTagKeys() []string {
 	var keys []string
 	for result.Next() {
 		key := fmt.Sprintf("%v", result.Record().Value())
-		keys = append(keys, key)
+		if key == "_measurement" || key == "_field" {
+			continue
+		} else {
+			keys = append(keys, key)
+		}
+		fmt.Printf("keys: %q\n", keys)
 	}
 
 	return keys
