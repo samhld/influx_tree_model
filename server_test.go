@@ -6,17 +6,32 @@ import (
 	"testing"
 )
 
+// these tests require that this data exists in the InfluxDB instance exactly as it is...for now
 func TestServer(t *testing.T) {
-	req := newGetReq("/")
-	res := httptest.NewRecorder()
+	rule := "MEASUREMENT>region>app>FIELD"
+	measurement := "test"
+	t.Run("make tree from rule", func(t *testing.T) {
+		gotTree := makeTreeFromRule(rule, measurement)
+		wantTree := Tree{
+			0: &Measurement{"test", 0},
+			1: &Key{"region", 1, []string{"us-east", "us-west"}, nil, nil},
+			2: &Key{"app", 2, []string{"cart", "home", "login"}, nil, nil},
+			3: &Field{"FIELD", 3},
+		}
 
-	Serve(res, req)
+		assertEqual(t, gotTree, wantTree)
+	})
+	t.Run("make tree no rule", func(t *testing.T) {
+		gotTree := makeTreeNoRule(measurement)
+		wantTree := Tree{
+			0: &Measurement{"test", 0},
+			1: &Key{"region", 1, []string{"us-east", "us-west"}, nil, nil},
+			2: &Key{"app", 2, []string{"cart", "home", "login"}, nil, nil},
+			3: &Field{"FIELD", 3},
+		}
 
-	got := res.Code
-	want := 200
-
-	assertStatus(t, got, want)
-
+		assertEqual(t, gotTree, wantTree)
+	})
 }
 
 func assertStatus(t testing.TB, got, want int) {
