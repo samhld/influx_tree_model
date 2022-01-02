@@ -35,7 +35,7 @@ func NewRuleTokenizer() *RuleTokenizer {
 
 func createBranches(tiers Tiers, fieldKeys []string) []Branch {
 	var branches []Branch
-	for f, _ := range fieldKeys {
+	for f := range fieldKeys {
 		var branch []string
 		t := 0
 		for t < len(tiers) {
@@ -52,19 +52,26 @@ func createBranches(tiers Tiers, fieldKeys []string) []Branch {
 	return branches
 }
 
-func MapTokensToData(measAPI *MeasurementAPI, tokenizedRule *TokenizedRule) Tiers {
+func MapTokensToData(measAPI dataGetter, tokenizedRule *TokenizedRule) Tiers {
 	tiers := make(Tiers)
+	tagTierTracker := 0 // increment each Tag tier; add to i to keep i aligned
 	for i, word := range tokenizedRule.words {
 		switch word.text {
 		case "MEASUREMENT":
-			tiers[i] = &Measurement{measAPI.measurement, i}
+			tiers[i+tagTierTracker] = &Measurement{measAPI.getMeasurement(), i}
 		case "FIELD":
-			fieldKeys := measAPI.getFieldKeys()
+			fields := measAPI.getFields()
 			// tiers[i] = []&Field{"FIELD", i}
-			tiers[i] = fieldKeys
+			tiers[i+tagTierTracker] = fields
 		default:
+			tiers[i+tagTierTracker] = &Key{word.text, i + tagTierTracker, nil, nil}
 			vals := measAPI.getTagKeyValues(word.text)
-			tiers[i] = &Key{word.text, i, vals, nil, nil}
+			tagTierTracker++
+			var values []*Value
+			for _, val := range vals {
+				values = append(values, &Value{val, i + tagTierTracker, nil, nil})
+			}
+			tiers[i+tagTierTracker] = values
 		}
 	}
 

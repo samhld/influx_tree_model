@@ -19,21 +19,21 @@ type RuleServer struct {
 	tokenizedRule *TokenizedRule
 }
 
-func makeTreeFromRule(rule, measurement string) Tiers {
+func makeTiersFromRule(rule, measurement string) Tiers {
 	ruleServer := NewRuleServer(rule, measurement)
 	return MapTokensToData(ruleServer.measAPI, ruleServer.tokenizedRule)
 }
 
-func makeTreeNoRule(measurement string) Tiers {
+func makeTiersNoRule(measurement string) Tiers {
 	ruleServer := NewRuleServer("", measurement)
 	keyValCountMap := ruleServer.measAPI.getTagKeyValueCounts()
 	sorted := sortByCardinality(keyValCountMap)
 	tiers := make(Tiers)
 	tiers[0] = &Measurement{measurement, 0}
 	for i, key := range sorted {
-		vals := ruleServer.measAPI.getTagKeyValues(key)
+		// vals := ruleServer.measAPI.getTagKeyValues(key)
 		tier := i + 1
-		tiers[tier] = &Key{key, tier, vals, nil, nil}
+		tiers[tier] = &Key{key, tier, nil, nil}
 	}
 	tier := len(sorted) + 1
 	tiers[tier] = ruleServer.measAPI.getFieldKeys()

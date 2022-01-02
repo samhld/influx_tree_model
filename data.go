@@ -16,8 +16,11 @@ const (
 // interface for testing?
 type dataGetter interface {
 	getTagKeys() []string
-	getTagKeyValues(flux string) []string
-	getTagKeyValueCounts(flux string) map[string]int64
+	getTagKeyValues(key string) []string
+	getTagKeyValueCounts() map[string]int64
+	getFieldKeys() []string
+	getMeasurement() string
+	getFields() []*Field
 }
 
 type MeasurementAPI struct {
@@ -26,6 +29,7 @@ type MeasurementAPI struct {
 	measurement    string
 	tagKeys        []string
 	tags           map[string][]Tag
+	fields         map[string]*Field
 	fieldKeys      []string
 	keyValCountMap map[string]int64 // map so not sorted -- must sort ad hoc to use
 	keyValsMap     map[string][]string
@@ -44,6 +48,7 @@ func NewMeasurementAPI(queryAPI api.QueryAPI, bucket, measurement string) *Measu
 		mAPI.setTagKeyValues(key)
 	}
 	mAPI.setFieldKeys()
+	mAPI.setFields()
 	return mAPI
 }
 
@@ -80,6 +85,21 @@ func (m *MeasurementAPI) getFieldKeys() []string {
 
 func (m *MeasurementAPI) setFieldKeys() {
 	m.setTagKeyValues("_field")
+}
+
+func (m *MeasurementAPI) getFields() []*Field {
+	var fields []*Field
+	for _, field := range m.fields {
+		fields = append(fields, field)
+	}
+	return fields
+}
+
+func (m *MeasurementAPI) setFields() {
+	m.fields = make(map[string]*Field)
+	for _, key := range m.fieldKeys {
+		m.fields[key] = &Field{key, 0}
+	}
 }
 
 func (m *MeasurementAPI) getTagKeyValues(key string) []string {
@@ -123,7 +143,7 @@ func (m *MeasurementAPI) setTagKeyValues(key string) {
 		for result.Next() {
 			tag := Tag{}
 			strVal := fmt.Sprintf("%v", result.Record().Value())
-			tag.key = Key{key, 0, nil, nil, nil}
+			tag.key = Key{key, 0, nil, nil}
 			tag.value = Value{strVal, 0, nil, nil}
 			tags = append(tags, tag)
 		}
@@ -148,4 +168,8 @@ func (m *MeasurementAPI) getTagKeyValueCounts() map[string]int64 {
 		m.keyValCountMap[tag] = val
 	}
 	return m.keyValCountMap
+}
+
+func (m *MeasurementAPI) getMeasurement() string {
+	return m.measurement
 }

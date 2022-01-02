@@ -54,13 +54,12 @@ func (t *Tag) Text() string {
 type Key struct {
 	text   string
 	tier   int
-	values []string
 	parent *Node
 	child  *Node
 }
 
 func NewKey(text string, parent *Node, tier int) *Key {
-	return &Key{text, tier, nil, parent, nil}
+	return &Key{text, tier, parent, nil}
 }
 
 func (k *Key) Tier() int {
@@ -78,7 +77,7 @@ type Field struct {
 }
 
 func NewField(text string, parent *Node, tier int) *Key {
-	return &Key{text, tier, nil, parent, nil}
+	return &Key{text, tier, parent, nil}
 }
 
 func (f *Field) Tier() int {
